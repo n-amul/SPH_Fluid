@@ -23,6 +23,9 @@ add_executable(${PROJECT_NAME}
     src/model.cpp src/model.h
     src/framebuffer.cpp src/framebuffer.h
     src/shadow_map.cpp src/shadow_map.h
+    src/sphSystem.cpp src/sphSystem.h
+    src/sphCalculation.cpp src/sphCalculation.h
+    src/Timer.cpp src/Timer.h
     )
 
 include(Dependency.cmake)

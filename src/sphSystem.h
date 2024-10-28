@@ -2,6 +2,8 @@
 #define __SPHSYS_H__
 
 #include "model.h"
+#include "Timer.h"
+#include <thread>
 
 struct Particle
 {
@@ -14,7 +16,7 @@ struct Particle
 struct SPHSettings
 {
     SPHSettings(
-        float mass, float restDensity, float gasConst, float viscosity,
+        float mass, float restDensity, float gasConstant, float viscosity,
         float h, float g, float tension);
 
     glm::mat4 sphereScale;

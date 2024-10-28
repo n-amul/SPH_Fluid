@@ -12,6 +12,7 @@
 #include "framebuffer.h"
 #include "shadow_map.h"
 #include <time.h>
+#include "sphSystem.h"
 
 CLASS_PTR(Context)
 
@@ -30,8 +31,11 @@ class Context
     Context(){};
     bool Init();
 
+    //programs
     ProgramUPtr m_program;
     ProgramUPtr m_simpleProgram;
+    ProgramUPtr m_particles;
+    
     float m_gamma {1.0f};
 
     bool m_animation{true};
@@ -65,7 +69,7 @@ class Context
     Light m_light;
     //objs
     MeshUPtr m_lightbox;
-    ModelUPtr m_sphere;
+    SphSystem* m_sphSystem;
     
     bool m_blinn{true};
     int m_width{1920};

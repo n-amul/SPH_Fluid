@@ -1,7 +1,8 @@
 #include "sphSystem.h"
+#include "sphCalculation.h"
 
 SPHSettings::SPHSettings(
-    float mass, float restDensity, float gasConst, float viscosity, float h,
+    float mass, float restDensity, float gasConstant, float viscosity, float h,
     float g, float tension):
     mass(mass),
     restDensity(restDensity),
@@ -20,28 +21,33 @@ SPHSettings::SPHSettings(
     massPoly6Product = mass * poly6; // Used in density calculations involving neighboring particles.
     sphereScale = glm::scale(glm::mat4(1.0),glm::vec3(h/2.f)); //scale matrix for rendering
 }
+
+SphSystem::~SphSystem()
+{
+    delete[] sphereModelMtxs;
+    delete[] particles;
+}
+
 SphSystem::SphSystem(size_t particleCubeWidth, const SPHSettings &settings, const bool &runOnGPU): 
     particleCubeWidth(particleCubeWidth),
     settings(settings),
     runOnGPU(runOnGPU)
 {
     particleCount = particleCubeWidth * particleCubeWidth * particleCubeWidth;
-    particles = (Particle*)malloc(sizeof(Particle) * particleCount);
+    particles = new Particle[particleCount];
 
-    // Load in sphere geometry and allocate matrice space
-    sphere = Model::Load("../../model/lowsphere.obj");//
+    // Load sphere and allocate matrice space
+    sphere = Model::Load("../../model/lowsphere.obj");
     sphereModelMtxs = new glm::mat4[particleCount];
 
     initParticles();
 
 	// Generate VBO for sphere model matrices
-    m_vbo=Buffer::CreateWithData(GL_ARRAY_BUFFER,GL_DYNAMIC_DRAW,&sphereModelMtxs[0],sizeof(glm::mat4),particleCount);
+    m_vbo=Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW, &sphereModelMtxs[0], sizeof(glm::mat4), particleCount);
 
 	// Setup instance VAO
-    // glBindVertexArray(sphere->vao);
-	// glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), 0);
     m_vao=VertexLayout::Create();
+    m_vao->Bind();
     m_vao->SetAttrib(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), 0);
     m_vao->SetAttrib(3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), sizeof(glm::vec4));
     m_vao->SetAttrib(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), sizeof(glm::vec4) * 2);
@@ -56,6 +62,7 @@ SphSystem::SphSystem(size_t particleCubeWidth, const SPHSettings &settings, cons
 	//start init
 	started = false;
 }
+
 
 void SphSystem::initParticles()
 {
@@ -94,21 +101,22 @@ void SphSystem::update(float deltaTime) {
 	if (!started) return;
 	// To increase system stability, a fixed deltaTime is set
 	deltaTime = 0.003f;
-    //updateParticles(particles, sphereModelMtxs, particleCount, settings, deltaTime, runOnGPU);
+    updateParticles(particles, sphereModelMtxs, particleCount, settings, deltaTime, runOnGPU);
 }
+
 void SphSystem::draw(const glm::mat4& viewProjMtx, Program* program) {
-	// Send matrix data to GPU
+	// update the matrices that is in the GPU
 	m_vbo->Bind();
     void* data=glMapBuffer(GL_ARRAY_BUFFER,GL_WRITE_ONLY);
-    memcpy(data,sphereModelMtxs,sizeof(glm::mat4)*particleCount);
+    memcpy(data, sphereModelMtxs, sizeof(glm::mat4) * particleCount);
     glUnmapBuffer(GL_ARRAY_BUFFER);
-    glBindBuffer(GL_ARRAY_BUFFER,0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     //draw particles
     program->Use();
-    program->SetUniform("viewProjMtx",viewProjMtx);
+    program->SetUniform("viewProjMtx", viewProjMtx);
     sphere->GetMesh(0)->GetVertexLayout()->Bind();
-    glDrawElementsInstanced(GL_TRIANGLES,sphere->GetMesh(0)->GetIndexBuffer()->GetSize(),GL_UNSIGNED_INT,0,particleCount);
+    glDrawElementsInstanced(GL_TRIANGLES, sphere->GetMesh(0)->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0, particleCount);
 }
 
 void SphSystem::reset() {
