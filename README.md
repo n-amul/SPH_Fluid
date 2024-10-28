@@ -27,7 +27,7 @@ cmake -Bbuild . -DCMAKE_BUILD_TYPE=Debug
 - `-Bbuild` specifies the build directory.
 - `.` indicates the source directory is the current directory.
 - `-DCMAKE_BUILD_TYPE=Debug` sets the build type to Debug.
-the dependencies listed in Dependency.cmake will be downloaded.
+- the dependencies listed in Dependency.cmake will be downloaded.
 
 ### 3. Run the Simulation
 
