@@ -27,14 +27,11 @@ cmake -Bbuild . -DCMAKE_BUILD_TYPE=Debug
 - `-Bbuild` specifies the build directory.
 - `.` indicates the source directory is the current directory.
 - `-DCMAKE_BUILD_TYPE=Debug` sets the build type to Debug.
-
+the dependencies listed in Dependency.cmake will be downloaded.
 
 ### 3. Run the Simulation
 
 Press `Ctrl + F5` in Visual Studio Code to run the simulation without debugging.
-
-
-## Additional Notes
-
-- to start the simulation press c,
-- to reset press r
+to start the simulation press c
+to reset press r
+right-click mouse to move around with wasd
