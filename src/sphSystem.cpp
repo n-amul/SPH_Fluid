@@ -1,5 +1,6 @@
 #include "sphSystem.h"
 #include "sphCalculation.h"
+#include <ctime>
 
 SPHSettings::SPHSettings(
     float mass, float restDensity, float gasConstant, float viscosity, float h,
@@ -46,12 +47,12 @@ SphSystem::SphSystem(size_t particleCubeWidth, const SPHSettings &settings, cons
     m_vbo=Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW, &sphereModelMtxs[0], sizeof(glm::mat4), particleCount);
 
 	// Setup instance VAO
-    m_vao=VertexLayout::Create();
-    m_vao->Bind();
-    m_vao->SetAttrib(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), 0);
-    m_vao->SetAttrib(3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), sizeof(glm::vec4));
-    m_vao->SetAttrib(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), sizeof(glm::vec4) * 2);
-    m_vao->SetAttrib(5, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), sizeof(glm::vec4) * 3);
+    //layout(location = 2) in mat4 ModelMtx; Although it starts at location 2, the mat4 actually occupies locations 2, 3, 4, and 5.
+    sphere->GetMesh(0)->GetVertexLayout()->Bind();
+    sphere->GetMesh(0)->GetVertexLayout()->SetAttrib(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), 0);
+    sphere->GetMesh(0)->GetVertexLayout()->SetAttrib(3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), sizeof(glm::vec4));
+    sphere->GetMesh(0)->GetVertexLayout()->SetAttrib(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), sizeof(glm::vec4) * 2);
+    sphere->GetMesh(0)->GetVertexLayout()->SetAttrib(5, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), sizeof(glm::vec4) * 3);
 	glVertexAttribDivisor(2,1);
 	glVertexAttribDivisor(3,1);
 	glVertexAttribDivisor(4,1);
@@ -80,7 +81,7 @@ void SphSystem::initParticles()
 			for (int k = 0; k < particleCubeWidth; k++) {
 				float ranX = (float(rand()) / float((RAND_MAX)) * 0.5f - 1) * settings.h / 10;
 				float ranY = (float(rand()) / float((RAND_MAX)) * 0.5f - 1) * settings.h / 10;
-				float ranZ = (float(rand()) / float((RAND_MAX)) * 0.5f - 1)* settings.h / 10;
+				float ranZ = (float(rand()) / float((RAND_MAX)) * 0.5f - 1) * settings.h / 10;
 				glm::vec3 nParticlePos = glm::vec3(
                     i * particleSeperation + ranX - 1.5f,
                     j * particleSeperation + ranY + settings.h + 0.1f,

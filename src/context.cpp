@@ -141,4 +141,10 @@ void Context::ProcessInput(GLFWwindow *window)
         m_cameraPos += cameraSpeed * cameraUp;
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         m_cameraPos -= cameraSpeed * cameraUp;
+    if(glfwGetKey(window,GLFW_KEY_C)==GLFW_PRESS){
+        m_sphSystem->startSimulation();
+    }
+    if(glfwGetKey(window,GLFW_KEY_R)==GLFW_PRESS){
+        m_sphSystem->reset();
+    }
 }

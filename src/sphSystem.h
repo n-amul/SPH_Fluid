@@ -32,7 +32,6 @@ private:
 	bool started;
     bool runOnGPU;
     BufferPtr m_vbo;
-    VertexLayoutUPtr m_vao;
 	//initializes the particles that will be used
 	void initParticles();
 
