@@ -7,6 +7,13 @@ set(DEP_INCLUDE_DIR ${DEP_INSTALL_DIR}/include)
 set(DEP_LIB_DIR ${DEP_INSTALL_DIR}/lib)
 
 # spdlog: fast logger library
+if(MSVC)
+    set(SPDLOG_CMAKE_CXX_FLAGS "/utf-8")
+else()
+    set(SPDLOG_CMAKE_CXX_FLAGS "")
+endif()
+
+# spdlog: fast logger library
 ExternalProject_Add(
     dep-spdlog
     GIT_REPOSITORY "https://github.com/gabime/spdlog.git"
@@ -14,9 +21,12 @@ ExternalProject_Add(
     GIT_SHALLOW 1
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+    CMAKE_ARGS 
+        -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+        -DCMAKE_CXX_FLAGS=${SPDLOG_CMAKE_CXX_FLAGS}  # Use the variable here
     TEST_COMMAND ""
 )
+
 # Dependency 리스트 및 라이브러리 파일 리스트 추가
 set(DEP_LIST ${DEP_LIST} dep-spdlog)
 set(DEP_LIBS ${DEP_LIBS} spdlog$<$<CONFIG:Debug>:d>)

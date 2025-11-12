@@ -3,12 +3,17 @@ cmake_minimum_required(VERSION 3.13)
 set(PROJECT_NAME SPH_Fluid)
 set(CMAKE_CXX_STANDARD 17)
 
-
 set(WINDOW_NAME "OpenGL")
 set(WINDOW_WIDTH 1920)
 set(WINDOW_HEIGHT 1080)
 
 project(${PROJECT_NAME})
+
+# Add compile options AFTER project() declaration
+if (MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 add_executable(${PROJECT_NAME} 
     src/main.cpp
     src/common.cpp src/common.h
@@ -28,8 +33,12 @@ add_executable(${PROJECT_NAME}
     src/Timer.cpp src/Timer.h
     )
 
-include(Dependency.cmake)
+# Now you can use target_compile_options since the target exists
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PUBLIC /wd4819)
+endif()
 
+include(Dependency.cmake)
 
 # 우리 프로젝트에 include / lib 관련 옵션 추가
 target_include_directories(${PROJECT_NAME} PUBLIC ${DEP_INCLUDE_DIR})
@@ -44,7 +53,3 @@ WINDOW_HEIGHT=${WINDOW_HEIGHT}
 
 # Dependency들이 먼저 build 될 수 있게 관계 설정
 add_dependencies(${PROJECT_NAME} ${DEP_LIST})
-
-if (MSVC)
-    target_compile_options(${PROJECT_NAME} PUBLIC /wd4819)
-endif()
